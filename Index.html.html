@@ -1,0 +1,428 @@
+<html><head><base href="." />
+<title>Quiz - A Superabundante Graça de Deus</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background: #f0f2f5;
+    color: #2c3e50;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    color: #1a73e8;
+    margin-bottom: 30px;
+  }
+
+  .quiz-container {
+    margin-top: 20px;
+  }
+
+  .question-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .options {
+    display: grid;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .option {
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .option:hover {
+    background: #e3f2fd;
+    border-color: #1a73e8;
+  }
+
+  .selected {
+    background: #1a73e8 !important;
+    color: white;
+    border-color: #1a73e8;
+  }
+
+  .correct {
+    background: #4caf50 !important;
+    color: white;
+  }
+
+  .incorrect {
+    background: #f44336 !important;
+    color: white;
+  }
+
+  .score-display {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 20px 0;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .progress {
+    height: 100%;
+    background: #1a73e8;
+    transition: width 0.3s ease;
+  }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #1557b0;
+  }
+
+  .feedback {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  @keyframes celebrate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: fall 3s linear infinite;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(-100vh) rotate(0deg); }
+    100% { transform: translateY(100vh) rotate(360deg); }
+  }
+
+  .welcome-screen {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .welcome-screen input {
+    padding: 10px;
+    font-size: 1.1em;
+    margin: 10px 0;
+    border: 2px solid #1a73e8;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .social-share {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .social-share button {
+    width: auto;
+    padding: 10px 20px;
+  }
+
+  .share-instagram { background: #C13584; }
+  .share-whatsapp { background: #25D366; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Quiz - A Superabundante Graça de Deus</h1>
+  <div id="welcomeScreen" class="welcome-screen">
+    <h2>Bem-vindo ao Quiz!</h2>
+    <input type="text" id="playerName" placeholder="Digite seu nome">
+    <button onclick="startQuiz()">Começar Quiz</button>
+  </div>
+  <div id="quizContent" style="display: none;">
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="quiz-container" id="quizContainer">
+      <!-- Questions will be inserted here -->
+    </div>
+    <div class="score-display" id="scoreDisplay"></div>
+    <button onclick="nextQuestion()" id="nextButton">Próxima Pergunta</button>
+  </div>
+</div>
+
+<script>
+let playerName = '';
+let startTime = 0;
+let timeBonus = 0;
+const questions = [
+  {
+    question: "De acordo com Romanos 8:28, o que coopera para o bem?",
+    options: [
+      "Apenas as coisas boas",
+      "Apenas as bênçãos",
+      "Todas as coisas",
+      "Apenas as obras de Deus"
+    ],
+    correct: 2
+  },
+  {
+    question: "Como devemos receber as bênçãos de Deus?",
+    options: [
+      "Por merecimento próprio",
+      "Pela graça, reconhecendo que não merecemos",
+      "Através de boas obras",
+      "Apenas quando somos perfeitos"
+    ],
+    correct: 1
+  },
+  {
+    question: "No Salmo 23, quando menciona o vale da sombra da morte, quem conduz a pessoa até lá?",
+    options: [
+      "O Senhor",
+      "O inimigo",
+      "A pessoa mesma",
+      "Os problemas da vida"
+    ],
+    correct: 2
+  },
+  {
+    question: "Segundo o texto, o que acontece com nossa fé quando tentamos merecer as bênçãos?",
+    options: [
+      "Ela aumenta",
+      "Ela diminui",
+      "Ela permanece igual",
+      "Ela se transforma"
+    ],
+    correct: 1
+  },
+  {
+    question: "De acordo com Romanos 8:32, se Deus não poupou seu próprio Filho, o que mais Ele fará?",
+    options: [
+      "Nos dará tudo mediante nosso merecimento",
+      "Nos dará graciosamente todas as coisas",
+      "Nos testará primeiro",
+      "Esperará nossa perfeição"
+    ],
+    correct: 1
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  playerName = document.getElementById('playerName').value;
+  if (!playerName) {
+    alert('Por favor, digite seu nome para começar!');
+    return;
+  }
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('quizContent').style.display = 'block';
+  displayQuestion();
+  updateScore();
+}
+
+function displayQuestion() {
+  startTime = Date.now();
+  const question = questions[currentQuestion];
+  const quizContainer = document.getElementById('quizContainer');
+  
+  let html = `
+    <div class="question-card">
+      <h3>${question.question}</h3>
+      <div class="options">
+  `;
+  
+  question.options.forEach((option, index) => {
+    html += `
+      <div class="option" onclick="selectOption(${index})">${option}</div>
+    `;
+  });
+  
+  html += `</div></div>`;
+  quizContainer.innerHTML = html;
+  
+  updateProgress();
+}
+
+function calculateTimeBonus() {
+  const timeElapsed = (Date.now() - startTime) / 1000; // Convert to seconds
+  const maxBonus = 100;
+  const timeBonus = Math.max(0, Math.floor(maxBonus - (timeElapsed * 10)));
+  return timeBonus;
+}
+
+function selectOption(optionIndex) {
+  if (answered) return;
+  
+  answered = true;
+  const options = document.querySelectorAll('.option');
+  const correct = questions[currentQuestion].correct;
+  
+  options[optionIndex].classList.add('selected');
+  
+  if (optionIndex === correct) {
+    timeBonus = calculateTimeBonus();
+    score += (1000 + timeBonus);
+    options[optionIndex].classList.add('correct');
+  } else {
+    options[optionIndex].classList.add('incorrect');
+    options[correct].classList.add('correct');
+  }
+  
+  updateScore();
+}
+
+function nextQuestion() {
+  if (!answered) return;
+  
+  currentQuestion++;
+  answered = false;
+  
+  if (currentQuestion < questions.length) {
+    displayQuestion();
+  } else {
+    showFinalResults();
+  }
+}
+
+function updateProgress() {
+  const progress = document.getElementById('progress');
+  const percentage = (currentQuestion / questions.length) * 100;
+  progress.style.width = `${percentage}%`;
+}
+
+function updateScore() {
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  scoreDisplay.textContent = `Pontuação: ${score}`;
+}
+
+function createConfetti() {
+  const celebration = document.createElement('div');
+  celebration.className = 'celebration';
+  
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    confetti.style.animationDelay = Math.random() * 3 + 's';
+    celebration.appendChild(confetti);
+  }
+  
+  document.body.appendChild(celebration);
+  setTimeout(() => celebration.remove(), 3000);
+}
+
+function shareScore(platform) {
+  const message = `Fiz ${score} pontos no Quiz sobre A Superabundante Graça de Deus! 🎉`;
+  let url = '';
+  
+  switch(platform) {
+    case 'instagram':
+      navigator.clipboard.writeText(message).then(() => {
+        alert('Mensagem copiada! Abra o Instagram e cole para compartilhar.');
+        window.open('https://instagram.com', '_blank');
+      });
+      break;
+    case 'whatsapp':
+      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+      break;
+  }
+}
+
+function showFinalResults() {
+  const quizContainer = document.getElementById('quizContainer');
+  const percentage = (score / (questions.length * 1000)) * 100;
+  
+  createConfetti();
+
+  const bibleVerses = [
+    "Porque pela graça sois salvos, por meio da fé; e isto não vem de vós, é dom de Deus. Não vem das obras, para que ninguém se glorie. - Efésios 2:8-9",
+    "Todas as coisas cooperam para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito. - Romanos 8:28",
+    "E, se com Cristo fostes ressuscitados, buscai as coisas que são de cima, onde Cristo está assentado à destra de Deus. - Colossenses 3:1"
+  ];
+
+  const randomVerse = bibleVerses[Math.floor(Math.random() * bibleVerses.length)];
+  
+  quizContainer.innerHTML = `
+    <div class="feedback" style="background: ${percentage >= 70 ? '#4caf50' : '#f44336'}; color: white;">
+      <h2>Parabéns, ${playerName}!</h2>
+      <h3>Quiz Finalizado!</h3>
+      <p>Sua pontuação final: ${score} pontos</p>
+      <p>${percentage >= 70 ? 'Excelente trabalho!' : 'Continue estudando!'}</p>
+    </div>
+    <div class="bible-verse" style="
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff;
+      border-left: 4px solid #1a73e8;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-style: italic;
+      color: #333;
+      text-align: center;
+    ">
+      <p style="font-size: 1.1em; line-height: 1.6;">${randomVerse}</p>
+    </div>
+  `;
+  
+  document.getElementById('nextButton').style.display = 'none';
+}
+
+// Start the quiz
+displayQuestion();
+updateScore();
+</script>
+</body>
+</html>
